@@ -1,8 +1,13 @@
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, onTaskDeleted, onTaskToggled, onTaskEdit }) => {
+const TaskList = ({
+  tasks,
+  onTaskDeleted,
+  onTaskToggled,
+  onTaskEdit,
+}) => {
   return (
-    <div>
+    <div className="space-y-3">
       {tasks.map((task) => (
         <TaskItem
           key={task._id}

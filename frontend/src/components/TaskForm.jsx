@@ -1,7 +1,15 @@
 import { useState } from 'react';
-import { createTask, updateTask } from '../services/taskService';
+import { Plus } from 'lucide-react';
+import {
+  createTask,
+  updateTask,
+} from '../services/taskService';
 
-const TaskForm = ({ onTaskCreated, onTaskUpdated, taskToEdit }) => {
+const TaskForm = ({
+  onTaskCreated,
+  onTaskUpdated,
+  taskToEdit,
+}) => {
   const [title, setTitle] = useState(
     taskToEdit ? taskToEdit.title : ''
   );
@@ -12,7 +20,6 @@ const TaskForm = ({ onTaskCreated, onTaskUpdated, taskToEdit }) => {
 
   /**
    * Handles changes in the task title input.
-   * @param {Object} event - Input change event
    */
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -20,68 +27,98 @@ const TaskForm = ({ onTaskCreated, onTaskUpdated, taskToEdit }) => {
 
   /**
    * Handles changes in the task description input.
-   * @param {Object} event - Input change event
    */
   const handleDescriptionChange = (event) => {
     setDescription(event.target.value);
   };
 
-/**
- * Creates a task through the backend API.
- * @param {Object} event - Form submission event
- */
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  /**
+   * Creates or updates a task.
+   */
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const taskData = {
-    title,
-    description,
+    const taskData = {
+      title: title.trim(),
+      description: description.trim(),
+    };
+
+    if (!taskData.title) {
+      return;
+    }
+
+    if (taskToEdit) {
+      const updatedTask = await updateTask(
+        taskToEdit._id,
+        taskData
+      );
+
+      onTaskUpdated(updatedTask);
+    } else {
+      const newTask = await createTask(taskData);
+
+      onTaskCreated(newTask);
+    }
+
+    setTitle('');
+    setDescription('');
   };
 
-  if (taskToEdit) {
-    // Edit mode: update the existing task.
-    const updatedTask = await updateTask(
-      taskToEdit._id,
-      taskData
-    );
-
-    onTaskUpdated(updatedTask);
-  } else {
-    // Add mode: create a new task.
-    const newTask = await createTask(taskData);
-
-    onTaskCreated(newTask);
-  }
-
-  setTitle('');
-  setDescription('');
-};
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5"
+    >
       <div>
-        <label htmlFor="title">Task Title</label>
+        <label
+          htmlFor="title"
+          className="mb-2 block text-sm font-medium text-gray-300"
+        >
+          Task Title
+        </label>
 
         <input
           id="title"
           type="text"
           value={title}
           onChange={handleTitleChange}
-          placeholder="Enter task title"
+          placeholder="What do you want to do?"
+          maxLength={100}
+          className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/10"
         />
       </div>
 
       <div>
-        <label htmlFor="description">Description</label>
+        <div className="mb-2 flex items-center justify-between">
+          <label
+            htmlFor="description"
+            className="text-sm font-medium text-gray-300"
+          >
+            Description
+          </label>
+
+          <span className="text-xs text-gray-600">
+            {description.length}/500
+          </span>
+        </div>
 
         <textarea
           id="description"
           value={description}
           onChange={handleDescriptionChange}
-          placeholder="Enter task description"
+          placeholder="Add more details (optional)..."
+          maxLength={500}
+          rows={7}
+          className="w-full resize-none rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/10"
         />
       </div>
 
-      <button type="submit">
+      <button
+        type="submit"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-300 px-5 py-3.5 font-semibold text-black transition hover:bg-amber-200 active:scale-[0.99]"
+      >
+        <Plus size={20} />
+
         {taskToEdit ? 'Update Task' : 'Add Task'}
       </button>
     </form>
