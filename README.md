@@ -69,7 +69,7 @@ task-tracker/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-github-repository-url>
+git clone https://github.com/anand16-info/Task-Tracker.git
 cd task-tracker
 ```
 
